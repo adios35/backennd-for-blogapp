@@ -21,12 +21,14 @@ app.use("/v1/post", postRoutes);
 //eslint-disable-next-line
 const port = process.env.PORT || 3000;
 
-app.listen(port, async () => {
-  console.log("Server is running on port ", port);
-  //eslint-disable-next-line
-  await mongoose.connect(process.env.MONGO_URI);
+mongoose.connect(process.env.MONGO_URI).then(() => {
   console.log("database connected");
-  // for (let i = 0; i < 8; i++) {
-  //   await createRandomUser()
-  // }
+  app.listen(port, async () => {
+    console.log("Server is running on port ", port);
+    //eslint-disable-next-line
+
+    // for (let i = 0; i < 8; i++) {
+    //   await createRandomUser()
+    // }
+  });
 });
