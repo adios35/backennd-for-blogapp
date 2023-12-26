@@ -1,20 +1,10 @@
-import express from "express";
-import {
-  createUser,
-  generateToken,
-  loginUser,
-  userLogOut,
-} from "../controller/auth.js";
+import Express from "express";
+import { createUser, loginUser, userLogOut } from "../controller/auth.js";
 import { verifyToken } from "../middleware/verifiyToken.js";
-import { getUsers } from "../controller/user.js";
-const app = express.Router();
+const router = Express();
 
-// app.get("/logout", userLogOut);
-app.get("/token", generateToken);
-app.post("/register", createUser);
-app.post("/login", loginUser);
-app.post("/logout", verifyToken, userLogOut);
-app.get("/user", verifyToken, getUsers);
+router.delete("/logout", verifyToken, userLogOut);
+router.post("/register", createUser);
+router.post("/login", loginUser);
 
-export default app;
-
+export default router;

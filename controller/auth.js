@@ -10,13 +10,13 @@ export async function loginUser(req, res) {
   const { email, password } = req.body;
   const isUserExist = await User.findOne({
     email,
-  })
+  });
   if (!isUserExist)
     return res.status(404).json({ message: "email tidak terdaftar" });
   try {
     const isPasswordCorrect = await bcrypt.compare(
       password,
-      isUserExist.password
+      isUserExist.password,
     );
     if (!isPasswordCorrect)
       return res.status(401).json({ message: "password tidak sesuai" });
@@ -26,7 +26,7 @@ export async function loginUser(req, res) {
       process.env.ACCESS_TOKEN,
       {
         expiresIn: "1d",
-      }
+      },
     );
     const refreshToken = jwt.sign(
       {
@@ -36,11 +36,11 @@ export async function loginUser(req, res) {
 
       //eslint-disable-next-line
       process.env.REFRESH_TOKEN,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
-    isUserExist.refreshToken = refreshToken
-    await isUserExist.save()
-    res.cookie("refreshToken",refreshToken, {
+    isUserExist.refreshToken = refreshToken;
+    await isUserExist.save();
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
@@ -67,12 +67,10 @@ export async function createUser(req, res) {
     const hashedPaswword = await hashPassword(password);
     const newUser = new User({
       email,
-      password: hashedPaswword
+      password: hashedPaswword,
     });
-    const user = await newUser.save()
-    return res
-      .status(200)
-      .json({ message: "account is created", user });
+    const user = await newUser.save();
+    return res.status(200).json({ message: "account is created", user });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "server error" });
@@ -80,14 +78,14 @@ export async function createUser(req, res) {
 }
 
 export async function userLogOut(req, res) {
-  const id = req.user.
-  console.log(req.user ? req.user :"user tidak ada")
+  const id = req.user.id;
   try {
     const user = await User.findOne({
       id,
     });
     if (!user) res.sendStatus(204);
-    return res.status(200).json({ message: "logged out" })
+    res.clearCookie("refreshToken");
+    return res.status(200).json({ message: "logged out" });
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -110,7 +108,7 @@ export async function generateToken(req, res) {
         process.env.ACCESS_TOKEN,
         {
           expiresIn: "1d",
-        }
+        },
       );
       res.json({ accessToken });
     });
